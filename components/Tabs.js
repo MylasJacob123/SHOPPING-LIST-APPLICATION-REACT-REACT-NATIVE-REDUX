@@ -59,5 +59,5 @@ const styles = StyleSheet.create({
   },
   tabButton: { padding: 10 },
   tabText: { fontSize: 16 },
-  activeTab: { fontWeight: "bold", color: "blue" },
+  activeTab: { fontWeight: "bold", color: "#2B2D42" },
 });

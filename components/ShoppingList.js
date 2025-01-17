@@ -1,7 +1,18 @@
 import React, { useState } from "react";
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { useDispatch } from "react-redux";
-import { deleteItem, editItem, togglePurchased } from "../redux/shoppingListSlice";
+import {
+  deleteItem,
+  editItem,
+  togglePurchased,
+  checkoutShoppingItem,
+} from "../redux/shoppingListSlice";
 import EditItemModal from "./EditItemModal";
 
 function ShoppingList({ items }) {
@@ -20,6 +31,10 @@ function ShoppingList({ items }) {
 
   const handleDelete = (id) => {
     dispatch(deleteItem(id));
+  };
+
+  const handleCheckout = (id) => {
+    dispatch(checkoutShoppingItem(id));
   };
 
   const openEditModal = (item) => {
@@ -41,7 +56,12 @@ function ShoppingList({ items }) {
         renderItem={({ item }) => (
           <View style={styles.listItem}>
             <TouchableOpacity onPress={() => handleTogglePurchased(item.id)}>
-              <Text style={item.purchased ? styles.purchased : styles.notPurchased}>
+              <Text
+                style={[
+                  item.purchased ? styles.purchased : styles.notPurchased,
+                  item.checkedOut && styles.checkedOut,
+                ]}
+              >
                 {item.name} ({item.quantity})
               </Text>
             </TouchableOpacity>
@@ -51,6 +71,11 @@ function ShoppingList({ items }) {
               </TouchableOpacity>
               <TouchableOpacity onPress={() => handleDelete(item.id)}>
                 <Text style={styles.deleteButton}>X</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => handleCheckout(item.id)}>
+                <Text style={styles.checkoutButton}>
+                  {item.checkedOut ? "Checked Out" : "Checkout"}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -66,7 +91,7 @@ function ShoppingList({ items }) {
       )}
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -96,6 +121,9 @@ const styles = StyleSheet.create({
   notPurchased: {
     textDecorationLine: "none",
   },
+  checkedOut: {
+    textDecorationLine: "line-through",
+  },
   actions: {
     flexDirection: "row",
   },
@@ -105,6 +133,10 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     color: "#d90429",
+  },
+  checkoutButton: {
+    color: "#007bff",
+    marginLeft: 10,
   },
 });
 

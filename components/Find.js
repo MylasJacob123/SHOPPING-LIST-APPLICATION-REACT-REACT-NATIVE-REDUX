@@ -26,7 +26,7 @@ function Find() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Search Items</Text>
+      <Text style={styles.header}>Search</Text>
       <TextInput
         style={styles.input}
         placeholder="Search by Item Name"
@@ -52,13 +52,15 @@ function Find() {
 export default Find;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
+  container: { flex: 1, padding: 16, marginTop: 15 },
   header: { fontSize: 24, marginBottom: 16 },
   input: { borderWidth: 1, padding: 8, marginBottom: 16 },
   categoryContainer: {
+    alignSelf: "center",
     flexDirection: "row",
     justifyContent: "space-around",
     marginBottom: 16,
+    gap: 5
   },
   item: { padding: 8, borderBottomWidth: 1 },
   category: { fontSize: 12, color: "gray" },
