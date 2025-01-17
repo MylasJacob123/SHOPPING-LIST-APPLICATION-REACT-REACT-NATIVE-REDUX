@@ -1,32 +1,23 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  FlatList,
-  StyleSheet,
-} from "react-native";
+import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  addItem,
-  deleteItem,
-  togglePurchased,
-} from "../redux/shoppingListSlice";
+import { addItem, deleteItem, editItem, togglePurchased } from "../redux/shoppingListSlice";
+import AddItemForm from "./AddItemForm";
+import EditItemModal from "./EditItemModal";
 
 const ShoppingList = () => {
   const dispatch = useDispatch();
   const items = useSelector((state) => state.shoppingList.items);
 
-  const [name, setName] = useState("");
-  const [quantity, setQuantity] = useState("");
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
 
-  const handleAddItem = () => {
-    if (name.trim() && quantity.trim()) {
-      dispatch(addItem({ name, quantity }));
-      setName("");
-      setQuantity("");
-    }
+  const handleAddItem = (item) => {
+    dispatch(addItem(item));
+  };
+
+  const handleEditItem = (updatedItem) => {
+    dispatch(editItem(updatedItem));
   };
 
   const handleTogglePurchased = (id) => {
@@ -37,44 +28,49 @@ const ShoppingList = () => {
     dispatch(deleteItem(id));
   };
 
+  const openEditModal = (item) => {
+    setSelectedItem(item);
+    setEditModalVisible(true);
+  };
+
+  const closeEditModal = () => {
+    setEditModalVisible(false);
+    setSelectedItem(null);
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Shopping List</Text>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Item Name"
-          value={name}
-          onChangeText={setName}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Quantity"
-          value={quantity}
-          onChangeText={setQuantity}
-        />
-        <TouchableOpacity style={styles.addButton} onPress={handleAddItem}>
-          <Text style={styles.addButtonText}>Add</Text>
-        </TouchableOpacity>
-      </View>
+      <AddItemForm onAddItem={handleAddItem} />
       <FlatList
         data={items}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.listItem}>
             <TouchableOpacity onPress={() => handleTogglePurchased(item.id)}>
-              <Text
-                style={item.purchased ? styles.purchased : styles.notPurchased}
-              >
+              <Text style={item.purchased ? styles.purchased : styles.notPurchased}>
                 {item.name} ({item.quantity})
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleDelete(item.id)}>
-              <Text style={styles.deleteButton}>X</Text>
-            </TouchableOpacity>
+            <View style={styles.actions}>
+              <TouchableOpacity onPress={() => openEditModal(item)}>
+                <Text style={styles.editButton}>Edit</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => handleDelete(item.id)}>
+                <Text style={styles.deleteButton}>X</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
       />
+      {editModalVisible && (
+        <EditItemModal
+          visible={editModalVisible}
+          item={selectedItem}
+          onClose={closeEditModal}
+          onEdit={handleEditItem}
+        />
+      )}
     </View>
   );
 };
@@ -91,27 +87,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
-  inputContainer: {
-    flexDirection: "row",
-    marginBottom: 20,
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    padding: 10,
-    marginRight: 10,
-    borderRadius: 5,
-    backgroundColor: "#fff",
-  },
-  addButton: {
-    backgroundColor: "#2b2d42",
-    padding: 10,
-    borderRadius: 5,
-  },
-  addButtonText: {
-    color: "#fff",
-  },
   listItem: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -127,6 +102,13 @@ const styles = StyleSheet.create({
   },
   notPurchased: {
     textDecorationLine: "none",
+  },
+  actions: {
+    flexDirection: "row",
+  },
+  editButton: {
+    color: "#8D99AE",
+    marginRight: 10,
   },
   deleteButton: {
     color: "#d90429",
