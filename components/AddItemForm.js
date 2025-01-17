@@ -1,15 +1,30 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Modal,
+  FlatList,
+} from "react-native";
 
-const AddItemForm = ({ onAddItem }) => {
+function AddItemForm({ onAddItem }) {
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState("");
+  const [category, setCategory] = useState("Hats");
+  const [optionalNotes, setOptionalNotes] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const categories = ["Hats", "T-Shirts", "Trousers", "Shoes", "Custom"];
 
   const handleAdd = () => {
     if (name.trim() && quantity.trim()) {
-      onAddItem({ name, quantity });
+      onAddItem({ name, quantity, category, optionalNotes });
       setName("");
       setQuantity("");
+      setCategory("Hats");
+      setOptionalNotes("");
     }
   };
 
@@ -29,6 +44,56 @@ const AddItemForm = ({ onAddItem }) => {
         onChangeText={setQuantity}
         keyboardType="numeric"
       />
+
+      <Text style={styles.label}>Category</Text>
+      <TouchableOpacity
+        style={styles.input}
+        onPress={() => setModalVisible(true)}
+      >
+        <Text style={styles.categoryText}>{category}</Text>
+      </TouchableOpacity>
+
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <FlatList
+              data={categories}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.modalOption}
+                  onPress={() => {
+                    setCategory(item);
+                    setModalVisible(false);
+                  }}
+                >
+                  <Text style={styles.modalOptionText}>{item}</Text>
+                </TouchableOpacity>
+              )}
+            />
+            <TouchableOpacity
+              style={styles.modalCloseButton}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.modalCloseText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Optional Notes Input */}
+      <TextInput
+        style={styles.input}
+        placeholder="Optional Notes"
+        value={optionalNotes}
+        onChangeText={setOptionalNotes}
+      />
+
       <TouchableOpacity style={styles.addButton} onPress={handleAdd}>
         <Text style={styles.addButtonText}>Add Item</Text>
       </TouchableOpacity>
@@ -55,6 +120,49 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 5,
     backgroundColor: "#f9f9f9",
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "500",
+    marginVertical: 10,
+  },
+  categoryText: {
+    fontSize: 16,
+    paddingVertical: 10,
+    textAlign: "center",
+    color: "#333",
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: 300,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 20,
+  },
+  modalOption: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  modalOptionText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  modalCloseButton: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: "#669BBC",
+    borderRadius: 5,
+  },
+  modalCloseText: {
+    color: "#fff",
+    textAlign: "center",
+    fontWeight: "bold",
   },
   addButton: {
     backgroundColor: "#669BBC",

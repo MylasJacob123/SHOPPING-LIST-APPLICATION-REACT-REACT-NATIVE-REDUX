@@ -1,20 +1,14 @@
 import React, { useState } from "react";
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native";
-import { useSelector, useDispatch } from "react-redux";
-import { addItem, deleteItem, editItem, togglePurchased } from "../redux/shoppingListSlice";
-import AddItemForm from "./AddItemForm";
+import { useDispatch } from "react-redux";
+import { deleteItem, editItem, togglePurchased } from "../redux/shoppingListSlice";
 import EditItemModal from "./EditItemModal";
 
-const ShoppingList = () => {
+function ShoppingList({ items }) {
   const dispatch = useDispatch();
-  const items = useSelector((state) => state.shoppingList.items);
 
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-
-  const handleAddItem = (item) => {
-    dispatch(addItem(item));
-  };
 
   const handleEditItem = (updatedItem) => {
     dispatch(editItem(updatedItem));
@@ -40,8 +34,7 @@ const ShoppingList = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Shopping List</Text>
-      <AddItemForm onAddItem={handleAddItem} />
+      <Text style={styles.title}>Items</Text>
       <FlatList
         data={items}
         keyExtractor={(item) => item.id}
@@ -84,7 +77,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    textAlign: "center",
+    textAlign: "left",
     marginBottom: 20,
   },
   listItem: {

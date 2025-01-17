@@ -1,20 +1,18 @@
 import React, { useState } from "react";
-import {
-  Modal,
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList } from "react-native";
 
-const EditItemModal = ({ visible, item, onClose, onEdit }) => {
+function EditItemModal ({ visible, item, onClose, onEdit }) {
   const [name, setName] = useState(item?.name || "");
   const [quantity, setQuantity] = useState(item?.quantity || "");
+  const [category, setCategory] = useState(item?.category || "Hats");
+  const [optionalNotes, setOptionalNotes] = useState(item?.optionalNotes || "");
+  const [categoryModalVisible, setCategoryModalVisible] = useState(false); 
+
+  const categories = ["Hats", "T-Shirts", "Trousers", "Shoes", "Custom"];
 
   const handleEdit = () => {
     if (name.trim() && quantity.trim()) {
-      onEdit({ ...item, name, quantity });
+      onEdit({ ...item, name, quantity, category, optionalNotes });
       onClose();
     }
   };
@@ -37,6 +35,52 @@ const EditItemModal = ({ visible, item, onClose, onEdit }) => {
             onChangeText={setQuantity}
             keyboardType="numeric"
           />
+
+          <Text style={styles.label}>Category</Text>
+          <TouchableOpacity style={styles.input} onPress={() => setCategoryModalVisible(true)}>
+            <Text style={styles.categoryText}>{category}</Text>
+          </TouchableOpacity>
+
+          <Modal
+            visible={categoryModalVisible}
+            animationType="slide"
+            transparent={true}
+            onRequestClose={() => setCategoryModalVisible(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                <FlatList
+                  data={categories}
+                  keyExtractor={(item) => item}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      style={styles.modalOption}
+                      onPress={() => {
+                        setCategory(item);
+                        setCategoryModalVisible(false);
+                      }}
+                    >
+                      <Text style={styles.modalOptionText}>{item}</Text>
+                    </TouchableOpacity>
+                  )}
+                />
+                <TouchableOpacity
+                  style={styles.modalCloseButton}
+                  onPress={() => setCategoryModalVisible(false)}
+                >
+                  <Text style={styles.modalCloseText}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+
+          <TextInput
+            style={styles.input}
+            placeholder="Optional Notes"
+            value={optionalNotes}
+            onChangeText={setOptionalNotes}
+          />
+
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.saveButton} onPress={handleEdit}>
               <Text style={styles.saveButtonText}>Save</Text>
@@ -76,6 +120,49 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 5,
     backgroundColor: "#f9f9f9",
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "500",
+    marginVertical: 10,
+  },
+  categoryText: {
+    fontSize: 16,
+    paddingVertical: 10,
+    textAlign: "center",
+    color: "#333",
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: 300,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 20,
+  },
+  modalOption: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  modalOptionText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  modalCloseButton: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: "#669BBC",
+    borderRadius: 5,
+  },
+  modalCloseText: {
+    color: "#fff",
+    textAlign: "center",
+    fontWeight: "bold",
   },
   buttonContainer: {
     flexDirection: "row",

@@ -19,11 +19,13 @@ const shoppingListSlice = createSlice({
       state.items = state.items.filter((item) => item.id !== action.payload);
     },
     editItem: (state, action) => {
-      const { id, name, quantity } = action.payload;
+      const { id, name, quantity, category, optionalNotes } = action.payload;
       const item = state.items.find((item) => item.id === id);
       if (item) {
         item.name = name;
         item.quantity = quantity;
+        item.category = category;
+        item.optionalNotes = optionalNotes;
       }
     },
     togglePurchased: (state, action) => {
